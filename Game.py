@@ -125,15 +125,26 @@ def redrawGameWindow():
 man = Player(200, 410, 64,64)
 goblin = Enemy(100, 410, 64, 64, 300)
 bullets = []
+shoot_loop = 0
 running = True
 while running:
     clock.tick(27)
+
+    if shoot_loop > 0:
+        shoot_loop += 1
+    if shoot_loop > 3:
+        shoot_loop = 0
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:  # Если нажали крестик
             running = False
 
     for bullet in bullets:
+        if bullet.y - bullet.radius < goblin.hitbox[1] + goblin.hitbox[3] and bullet.y + bullet.radius > goblin.hitbox[1]:
+            if bullet.x + bullet.radius > goblin.hitbox[0] and bullet.x - bullet.radius < goblin.hitbox[0] + goblin.hitbox[2]:
+                goblin.hit()
+                bullets.pop(bullets.index(bullet))
+
         if 500 > bullet.x > 0:
             bullet.x += bullet.vel
         else:
@@ -141,7 +152,7 @@ while running:
 
     keys = pygame.key.get_pressed()
 
-    if keys[pygame.K_SPACE]:
+    if keys[pygame.K_SPACE] and shoot_loop == 0:
         if man.left:
             facing = -1
         else:
@@ -149,6 +160,8 @@ while running:
 
         if len(bullets) < 5:
             bullets.append(Projectile(round(man.x + man.width // 2), round(man.y + man.height // 2), 6, (0,0,0), facing))
+
+        shoot_loop = 1
 
     if keys[pygame.K_LEFT] and man.x > man.vel:
         man.x -= man.vel
