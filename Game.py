@@ -151,7 +151,7 @@ class Enemy(object):
 def redrawGameWindow():
     win.blit(bg, (0,0))
     text = font.render(f'Score: {score}', 1, (0,0,0))
-    win.blit(text, (365, 10))
+    win.blit(text, (350, 10))
     man.draw(win)
     goblin.draw(win)
     for bullet in bullets:
@@ -169,10 +169,11 @@ running = True
 while running:
     clock.tick(27)
 
-    if man.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and man.hitbox[1] + man.hitbox[3] > goblin.hitbox[1]:
-        if man.hitbox[0] + man.hitbox[2] > goblin.hitbox[0] and man.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]:
-            man.hit()
-            score -= 5
+    if goblin.visible:
+        if man.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and man.hitbox[1] + man.hitbox[3] > goblin.hitbox[1]:
+            if man.hitbox[0] + man.hitbox[2] > goblin.hitbox[0] and man.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]:
+                man.hit()
+                score -= 5
 
     if shoot_loop > 0:
         shoot_loop += 1
@@ -186,10 +187,11 @@ while running:
     for bullet in bullets:
         if bullet.y - bullet.radius < goblin.hitbox[1] + goblin.hitbox[3] and bullet.y + bullet.radius > goblin.hitbox[1]:
             if bullet.x + bullet.radius > goblin.hitbox[0] and bullet.x - bullet.radius < goblin.hitbox[0] + goblin.hitbox[2]:
-                hit_sound.play()
-                goblin.hit()
-                score += 1
-                bullets.pop(bullets.index(bullet))
+                if goblin.visible:
+                    hit_sound.play()
+                    goblin.hit()
+                    score += 1
+                    bullets.pop(bullets.index(bullet))
 
         if 500 > bullet.x > 0:
             bullet.x += bullet.vel
